@@ -1,10 +1,13 @@
 <?php
 function showVideo($isDoneCompressing, $videoId, $thumbnailPath): void
 {
+
 if ($isDoneCompressing) {
     global $videoCompressedDirectory;
     $videoPath = "$videoCompressedDirectory/$videoId.webm";
+    $videoPathFullQuality = $videoPath;
     $htmlHead = <<<HTML
+    <!-- Add discord embeding header to the html -->
     <meta name="viewport" content="width=device-width">
     <meta property="og:image" content="//cdn.eyer.life/$thumbnailPath">
     <meta property="og:type" content="video.other">
@@ -13,14 +16,18 @@ if ($isDoneCompressing) {
     <meta property="og:video:height" content="720">
     <meta property="theme-color" content="#C74600">
     HTML;
+    $htmlBody = "";
+
 } else {
     global $videoOriginalDirectory;
     global $videoCompressedDirectory;
 
     $cachedVideoPath = "$videoCompressedDirectory/$videoId.webm";
-    $videoPath = "noCacheVideo.php?externalVideoURL=$cachedVideoPath";
+    $videoPath = "noCacheProxy.php?externalVideoURL=$cachedVideoPath";
     $videoPathFullQuality = "$videoOriginalDirectory/$videoId.mp4";
-    $htmlVideoEncoding = <<<HTML
+    $htmlHead = "";
+    $htmlBody = <<<HTML
+    <!-- Add message informing the user, that the rendering process is not done yet -->
     <h2>Video is still encoding</h2>
     <p>Discord previews don't work right now because of technical reasons </p>
     <p>You can already watch the rendered video to the point it's rendered or view the video in original quality <a href="$videoPathFullQuality">here</a></p>
@@ -28,9 +35,9 @@ if ($isDoneCompressing) {
     HTML;
 }
 
-if (!file_exists("thumbnails/$videoId")) {
-    exec("ffmpeg -i $videoPath -ss 00:00:05 -vframes 1 -an -y $thumbnailPath");
-}
+    if (!file_exists("thumbnails/$videoId")) {
+        exec("ffmpeg -i $videoPathFullQuality -ss 00:00:05 -vframes 1 -an -y $thumbnailPath");
+    }
 
 $html = <<<HTML
 <!DOCTYPE html>
@@ -60,7 +67,7 @@ $html = <<<HTML
     }
     video {
         max-width: 75vw;
-        max-height: 100%;
+        max-height: 90%;
         width: auto;
         height: auto;
     }
@@ -68,7 +75,7 @@ $html = <<<HTML
 
 <body>
 <div class="center-container">
-$htmlVideoEncoding
+$htmlBody
 <video onloadstart="this.volume=0.1" id = "video" width="100%" poster="$thumbnailPath" controls>
     <source src="$videoPath" type="video/webm">
 </video>
@@ -77,5 +84,6 @@ $htmlVideoEncoding
 </body>
 </html>
 HTML;
+
 echo $html;
 }
