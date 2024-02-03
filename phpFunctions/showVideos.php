@@ -6,6 +6,8 @@ if ($isDoneCompressing) {
     global $videoCompressedDirectory;
     $videoPath = "$videoCompressedDirectory/$videoId.webm";
     $videoPathFullQuality = $videoPath;
+    $videoVolume = 0.1;
+    $autoplay = "";
     $htmlHead = <<<HTML
     <!-- Add discord embeding header to the html -->
     <meta name="viewport" content="width=device-width">
@@ -25,6 +27,8 @@ if ($isDoneCompressing) {
     $cachedVideoPath = "$videoCompressedDirectory/$videoId.webm";
     $videoPath = "noCacheProxy.php?externalVideoURL=$cachedVideoPath";
     $videoPathFullQuality = "$videoOriginalDirectory/$videoId.mp4";
+    $videoVolume = 0;
+    $autoplay = "autoplay";
     $htmlHead = "";
     $htmlBody = <<<HTML
     <!-- Add message informing the user, that the rendering process is not done yet -->
@@ -76,7 +80,7 @@ $html = <<<HTML
 <body>
 <div class="center-container">
 $htmlBody
-<video onloadstart="this.volume=0.1" id = "video" width="100%" poster="$thumbnailPath" controls>
+<video onloadstart="this.volume=$videoVolume" poster="$thumbnailPath" controls $autoplay>
     <source src="$videoPath" type="video/webm">
 </video>
 <br>

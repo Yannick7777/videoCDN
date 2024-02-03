@@ -44,5 +44,4 @@ function show404 (): void
 </html>
 HTML;
     echo $html;
-
 }
