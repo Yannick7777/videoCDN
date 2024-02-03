@@ -23,6 +23,9 @@ if ($videoId && in_array($videoId . '.webm', $availableCompressedVideos)) {
         $inputVideoPath = "$videoOriginalDirectory/$videoId.mp4";
         $outputVideoPath = "$videoCompressedDirectory/$videoId.webm";
         $cmd = "bash encode.sh $inputVideoPath $outputVideoPath"; // Set command for executing the encoding script
+        if (!file_exists($thumbnailPath)) {
+            exec("ffmpeg -i $inputVideoPath -ss 00:00:05 -vframes 1 -an -y $thumbnailPath");
+        }
         exec($cmd . " > /dev/null &"); // Execute the script while continuing the php
         sleep(3);
         header("Refresh:0"); // Refresh page
