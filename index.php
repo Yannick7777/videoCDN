@@ -3,10 +3,25 @@ include "phpFunctions/showVideos.php";
 include "phpFunctions/show404.php";
 
 $videoId = $_GET['id'] ?? null; // Get Video ID
+$friend = $_GET['f'] ?? null; // Get Video ID
 
-$videoCompressedDirectory = 'videos/compressed';
-$videoOriginalDirectory = 'videos/original';
-$thumbnailPath = "thumbnails/$videoId.jpg";
+if ($friend != null) {
+    $usersJson = file_get_contents('friends.json');
+    $data = json_decode($usersJson, true);
+    $allUsers = array_column($data, 'username');
+    $friendFound = in_array($friend, $allUsers);
+    if ($friendFound) {
+        $videoCompressedDirectory = "friends/$friend/videos/compressed";
+        $videoOriginalDirectory = "friends/$friend/videos/original";
+        $thumbnailPath = "friends/$friend/thumbnails/$videoId.jpg";
+    } else {
+        show404();
+    }
+} else {
+    $videoCompressedDirectory = 'videos/compressed';
+    $videoOriginalDirectory = 'videos/original';
+    $thumbnailPath = "thumbnails/$videoId.jpg";
+}
 
 $availableCompressedVideos = array_diff(scandir($videoCompressedDirectory), ['.', '..']); // Get available compressed videos
 
@@ -26,7 +41,7 @@ if ($videoId && in_array($videoId . '.webm', $availableCompressedVideos)) {
         if (!file_exists($thumbnailPath)) {
             exec("ffmpeg -i $inputVideoPath -ss 00:00:05 -vframes 1 -an -y $thumbnailPath");
         }
-        exec($cmd . " > /dev/null &"); // Execute the script while continuing the php
+        shell_exec($cmd . " > /dev/null &"); // Execute the script while continuing the php
         sleep(3);
         header("Refresh:0"); // Refresh page
     } else {show404();}
