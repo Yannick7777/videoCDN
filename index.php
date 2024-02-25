@@ -2,8 +2,9 @@
 include "phpFunctions/showVideos.php";
 include "phpFunctions/show404.php";
 
-$videoId = $_GET['id'] ?? null; // Get Video ID
-$friend = $_GET['f'] ?? null; // Get Video ID
+$videoId = $_GET['id'] ?? null;
+$friend = $_GET['f'] ?? null;
+$originalQuality = $_GET['oq'] ?? false;
 
 if ($friend != null) {
     $usersJson = file_get_contents('friends.json');

@@ -1,11 +1,18 @@
 <?php
 function showVideo($isDoneCompressing, $videoId, $thumbnailPath): void
 {
-
-if ($isDoneCompressing) {
+global $originalQuality;
+if ($isDoneCompressing || $originalQuality) {
     global $videoCompressedDirectory;
-    $videoPath = "$videoCompressedDirectory/$videoId.webm";
-    $videoPathFullQuality = $videoPath;
+    global $videoOriginalDirectory;
+    global $originalQuality;
+
+    if ($originalQuality) {
+        $videoPath = "$videoOriginalDirectory/$videoId.mp4";
+    } else {
+        $videoPath = "$videoCompressedDirectory/$videoId.webm";
+    }
+
     $videoVolume = 0.1;
     $autoplay = "";
     $htmlHead = <<<HTML
